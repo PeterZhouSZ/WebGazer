@@ -1,15 +1,18 @@
 (function(window) {
-    "use strict"
+    "use strict";
 
     window.webgazer = window.webgazer || {};
     webgazer.tracker = webgazer.tracker || {};
     webgazer.util = webgazer.util || {};
+    webgazer.params = webgazer.params || {};
 
     /**
-     * Initialize clmtrackr object
+     * Constructor of ClmGaze,
+     * initialize ClmTrackr object
+     * @constructor
      */
     var ClmGaze = function() {
-        this.clm = new clm.tracker({useWebGL : true});
+        this.clm = new clm.tracker(webgazer.params.camConstraints);
         this.clm.init(pModel);
         var F = [ [1, 0, 0, 0, 1, 0],
                   [0, 1, 0, 0, 0, 1],
@@ -39,20 +42,20 @@
 
         this.leftKalman = new self.webgazer.util.KalmanFilter(F, H, Q, R, P_initial, x_initial);
         this.rightKalman = new self.webgazer.util.KalmanFilter(F, H, Q, R, P_initial, x_initial);
-    }
+    };
 
     webgazer.tracker.ClmGaze = ClmGaze;
 
     /**
      * Isolates the two patches that correspond to the user's eyes
      * @param  {Canvas} imageCanvas - canvas corresponding to the webcam stream
-     * @param  {number} width - of imageCanvas
-     * @param  {number} height - of imageCanvas
+     * @param  {Number} width - of imageCanvas
+     * @param  {Number} height - of imageCanvas
      * @return {Object} the two eye-patches, first left, then right eye
      */
     ClmGaze.prototype.getEyePatches = function(imageCanvas, width, height) {
 
-        if (imageCanvas.width == 0) {
+        if (imageCanvas.width === 0) {
             return null;
         }
 
@@ -89,12 +92,12 @@
         rightWidth = Math.round(rightBox[2] - rightBox[0]);
         rightHeight = Math.round(rightBox[3] - rightBox[1]);
 
-        if (leftWidth == 0 || rightWidth == 0){
+        if (leftWidth === 0 || rightWidth === 0){
           console.log('an eye patch had zero width');
           return null;
         }
 
-        if (leftHeight == 0 || rightHeight == 0){
+        if (leftHeight === 0 || rightHeight === 0){
           console.log("an eye patch had zero height");
           return null;
         }
@@ -121,7 +124,12 @@
         eyeObjs.positions = positions;
 
         return eyeObjs;
-    }
+    };
 
+    /**
+     * The Js_objectdetectGaze object name
+     * @type {string}
+     */
     ClmGaze.prototype.name = 'clmtrackr';
+    
 }(window));
